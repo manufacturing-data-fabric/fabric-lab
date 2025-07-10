@@ -148,4 +148,3 @@ add a -v flag if the volumes may be destroyed too
 
 portainer setting:
 local username: admin
-local passwd: Stephan1995!
