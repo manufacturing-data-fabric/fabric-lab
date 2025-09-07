@@ -114,37 +114,7 @@ All services share the `fabric-lab` network for seamless internal communication.
 For issues or contributions, feel free to open a ticket or fork the repo. Happy experimenting with your data fabric!
 ```
 
-Let me know if you'd like this as a file directly or if you want to tweak the wording/format!
 
-
-
-
-
-
-
-###### deprecated
-This is a lab for the data fabric architecture. It includes a mock that shows all the relevant components in interplay, including
-
-- A central message broker kafka instance
-- exemplary mock OPC UA data sources (3x)
-- OPC UA Connectors
-- a Graph Database storing the central knowledge graph
-- a python environment for the execution of the client or the agent
-
-
-
-starting
-
-```commandline
-docker compose up -d
-```
-
-stopping and removing all containers:
-```commandline
-docker compose down
-```
-add a -v flag if the volumes may be destroyed too
-
-
+# local config info:
 portainer setting:
 local username: admin
