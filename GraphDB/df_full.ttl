@@ -1,0 +1,351 @@
+@prefix df: <http://stephantrattnig.org/data_fabric_ontology#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+df:Capability a rdfs:Class ;
+    rdfs:label "Capability" ;
+    rdfs:comment "A general category for the capability of a connector and the underlying service in terms of interaction. Example: A read capability allows to read out data of service by requesting it." .
+
+df:Connector a rdfs:Class ;
+    rdfs:label "Connector" ;
+    rdfs:comment "An software component that connects the a data sources (e.g. IIoT device) or services, enabling data integration and interoperability. Has Gateway functionality. Communicates via predefined messaging." .
+
+df:CustomDevice a rdfs:Class ;
+    rdfs:label "Custom Device" ;
+    rdfs:comment "A specific type of service that is offered by an unspecified or non-standardized device. Examples include legacy devices or cameras that may only be interfaced with custom frameworks of various types (e.g. a specific vendors industrial camera or an modules_old legacy device using OT protocols." ;
+    rdfs:subClassOf df:IIoTService .
+
+df:DataPoint a rdfs:Class ;
+    rdfs:label "Data Point" ;
+    rdfs:comment "A unit of data provided by a device, such as a sensor reading or image." .
+
+df:DataStorage a rdfs:Class ;
+    rdfs:label "Data Storage" ;
+    rdfs:comment "A Data Storage is a specific type of service that is able to save data as well as to provide data which is stored persistently." ;
+    rdfs:subClassOf df:Service .
+
+df:Device a rdfs:Class ;
+    rdfs:label "Device" ;
+    rdfs:comment "A Device is a hardware component that is located close to a data source. Examples include IIoT devices or other sensing or acting components that provide data." .
+
+df:DockerImage a rdfs:Class ;
+    rdfs:label "Docker Image" ;
+    rdfs:comment "Represents a software image, such as a Docker container, associated with a service." .
+
+df:DocumentDB a rdfs:Class ;
+    rdfs:label "Document-oriented Database" ;
+    rdfs:comment "A Document-oriented Database is a service that is able to save and provide data in terms of structured docs such as xml or json files persistently." ;
+    rdfs:subClassOf df:DataStorage .
+
+df:IIoTService a rdfs:Class ;
+    rdfs:label "IIoT Service" ;
+    rdfs:comment "A subtype of service that represents an IIoT devices providing an IIoT-related service. Examples include OPC UA services, camera acquisition services or else." ;
+    rdfs:subClassOf df:Service .
+
+df:MessageBroker a rdfs:Class ;
+    rdfs:label "Message Broker" ;
+    rdfs:comment "A message broker is a middleware system that facilitates the exchange of messages between different applications or services, allowing them to communicate asynchronously. It manages message topics or queues, enabling producers to publish data and consumers to subscribe and retrieve it when needed." .
+
+df:OPCUAServer a rdfs:Class ;
+    rdfs:label "OPC UA Server" ;
+    rdfs:comment "Represents a service endpoint that is of type OPC UA Server and thus offers OPC UA-related IIoT services for the underlying or accompanying device. OPC UA denotes Open Platform Communications Unified Architecture." ;
+    rdfs:subClassOf df:IIoTService .
+
+df:ProcessingModule a rdfs:Class ;
+    rdfs:label "Processing Module" ;
+    rdfs:comment "A Processing module consumes data from a topic, processes it and then returns it to a topic again. Thus it acts as a data transformation service." ;
+    rdfs:subClassOf df:Service .
+
+df:ROSNode a rdfs:Class ;
+    rdfs:label "ROS Node" ;
+    rdfs:comment "A specific type of service typical for industrial robots that are directly communicated with and do not represent a typical IIoT endpoint. Interfaces are build in software libraries (e.g. ROS-provided Python framework)." ;
+    rdfs:subClassOf df:IIoTService .
+
+df:RelationalDB a rdfs:Class ;
+    rdfs:label "Relational Database" ;
+    rdfs:comment "A Relational Database is a service that is able to save and provide data in relational tables." ;
+    rdfs:subClassOf df:DataStorage .
+
+df:Service a rdfs:Class ;
+    rdfs:label "Service" ;
+    rdfs:comment "Representing a service endpoint within the data fabric, responsible for providing specific functionality or data to consumers or producers. Examples include data sources, data sinks, API endpoints, and similar." .
+
+df:ServiceRole a rdfs:Class ;
+    rdfs:label "Service Role" ;
+    rdfs:comment "A general category for the role of a service within the data fabric. A service may be of type data source, data sink or both." .
+
+df:Subscription a rdfs:Class ;
+    rdfs:label "Subscription" ;
+    rdfs:comment "A subscription established by a connector to track specific data points." .
+
+df:SubscriptionState a rdfs:Class ;
+    rdfs:label "Subscription State" .
+
+df:Topic a rdfs:Class ;
+    rdfs:label "Topic" ;
+    rdfs:comment "Represents a topic or channel of a message broker that is used to transfer data in an event-driven way using a produce/subscribe pattern." .
+
+df:TripleStoreDB a rdfs:Class ;
+    rdfs:label "Triplestore Database" ;
+    rdfs:comment "A Triplestore Database is a service that is able to save and provide data in terms of subject predicate object triples which are the foundation of Knowledge Graphs" ;
+    rdfs:subClassOf df:DataStorage .
+
+df:topicType a rdfs:Class ;
+    rdfs:label "Topic Type" ;
+    rdfs:comment "A class representing different types of topics in a messaging system, such as telemetry, request or response." .
+
+df:Active a df:SubscriptionState ;
+    rdfs:label "Active" .
+
+df:Closed a df:SubscriptionState ;
+    rdfs:label "Closed" .
+
+df:ConnectorAddress a rdf:Property ;
+    rdfs:label "Connector Address" ;
+    rdfs:comment "This property represents the address of a connector such as an IP address or a specific name within a domain." ;
+    rdfs:domain df:Connector ;
+    rdfs:range xsd:anyURI .
+
+df:DataSink a df:ServiceRole ;
+    rdfs:label "Data Sink" ;
+    rdfs:comment "A Data Sink is an entity that receives, stores, or consumes data from data sources. Examples include: databases, data warehouses or lakes, dashboards or visualization tools." .
+
+df:DataSource a df:ServiceRole ;
+    rdfs:label "Data Source" ;
+    rdfs:comment "A Data Source is an entity that produces or provides data to other systems or components. Examples include: sensors, APIs, data streams or files." .
+
+df:MessageBrokerAddress a rdf:Property ;
+    rdfs:label "Message Broker Address" ;
+    rdfs:comment "This property represents the address of a message broker such as an Kafka bootstrap server or else." ;
+    rdfs:domain df:MessageBroker ;
+    rdfs:range xsd:anyURI .
+
+df:MessageBrokerInstance a df:MessageBroker ;
+    rdfs:label "Message Broker Instance" ;
+    rdfs:comment "The instance of the MessageBroker. Every data Fabric may only have one MessageBroker. This MessageBroker may further have multiple bootstrap_servers." .
+
+df:ReadCapability a df:Capability ;
+    rdfs:label "Read Capability" ;
+    rdfs:comment "Capability to perform read operations on the data source, allowing data retrieval without modification." .
+
+df:SubscribeCapability a df:Capability ;
+    rdfs:label "Subscribe Capability" ;
+    rdfs:comment "Capability to subscribe to the data source, allowing notifications on data changes or updates." .
+
+df:WriteCapability a df:Capability ;
+    rdfs:label "Write Capability" ;
+    rdfs:comment "Capability to perform write operations on the data source, enabling data creation or modification." .
+
+df:allowsCapability a rdf:Property ;
+    rdfs:label "allows Capability" ;
+    rdfs:comment "Indicates that a data point allows a specific capability, such as reading or subscribing." ;
+    rdfs:domain df:DataPoint ;
+    rdfs:range df:Capability .
+
+df:belongsToDevice a rdf:Property ;
+    rdfs:label "belongs to Device" ;
+    rdfs:comment "Indicates that a subscription or data point belongs to a specific device." ;
+    rdfs:domain df:Subscription ;
+    rdfs:range df:Device .
+
+df:communicationProtocol a rdf:Property ;
+    rdfs:label "Device Communication Protocol" ;
+    rdfs:comment "Specifies the communication protocol used by the device to interface with a Connector. Examples include protocols like HTTP, AMQP, OPC UA or Modbus." ;
+    rdfs:domain df:Device ;
+    rdfs:range xsd:string .
+
+df:connectedTo a rdf:Property ;
+    rdfs:label "connected to" ;
+    rdfs:comment "Indicates that a connector is connected to a service and acts as a gateway for that service." ;
+    rdfs:domain df:Connector ;
+    rdfs:range df:Service .
+
+df:dataPointIdentifier a rdf:Property ;
+    rdfs:domain df:DataPoint ;
+    rdfs:range xsd:string .
+
+df:dataPointName a rdf:Property ;
+    rdfs:label "DataPoint Name" ;
+    rdfs:comment "A human-readable name for the data point such as e.g. 'TorqueSensor'. Should describe the datapoint semantically in contrast to technical identifiers." ;
+    rdfs:domain df:DataPoint ;
+    rdfs:range xsd:string .
+
+df:deviceAddress a rdf:Property ;
+    rdfs:label "Device Address" ;
+    rdfs:comment "This property represents a device address used to locate a device as a networked entity. Examples include IP addresses, domain names or URIs." ;
+    rdfs:domain df:Device ;
+    rdfs:range xsd:string .
+
+df:deviceIdentifier a rdf:Property ;
+    rdfs:label "Device Identifier" ;
+    rdfs:comment "A unique identifier for the device. Typically this identifier is valid within the local domain the data fabric is applied to." ;
+    rdfs:domain df:Device ;
+    rdfs:range xsd:string .
+
+df:deviceManufacturer a rdf:Property ;
+    rdfs:label "Device Manufacturer" ;
+    rdfs:comment "The manufacturer of the specific device or the System Integrator" ;
+    rdfs:domain df:Device ;
+    rdfs:range xsd:string .
+
+df:deviceModelName a rdf:Property ;
+    rdfs:label "Device Model Name" ;
+    rdfs:comment "Specifies the marketed model name or identifier of the device as provided by the manufacturer. This property is intended to capture the specific name commonly used to refer to the device model. It is distinct from a more general device type (e.g. 'camera' and it is further distinct from a unique serial number or identifier." ;
+    rdfs:domain df:Device ;
+    rdfs:range xsd:string .
+
+df:deviceType a rdf:Property ;
+    rdfs:label "Device Type" ;
+    rdfs:comment "Specifies the type or category of a device, such as e.g. OPC UA server, camera or Industrial Robot Control. This property helps classify devices based on their functional role within a system." ;
+    rdfs:domain df:Device ;
+    rdfs:range xsd:string .
+
+df:dockerImageName a rdf:Property ;
+    rdfs:label "Docker Image Name" ;
+    rdfs:comment "Specifies the unique identifier or tag of the Docker image such as 'repository/image:tag', associated with a Docker image entity." ;
+    rdfs:domain df:DockerImage ;
+    rdfs:range xsd:string .
+
+df:hasAccessMode a rdf:Property ;
+    rdfs:domain df:DataPoint ;
+    rdfs:range rdfs:Literal .
+
+df:hasCapability a rdf:Property ;
+    rdfs:label "has capability" ;
+    rdfs:comment "Indicates that a Connector has a specific capability. Basic examples include the capability to read, write or to subscribe to data of a underlying service." ;
+    rdfs:domain df:Connector ;
+    rdfs:range df:Capability .
+
+df:hasDataPoint a rdf:Property ;
+    rdfs:label "has Data Point" ;
+    rdfs:comment "Links a device to the data points it provides." ;
+    rdfs:domain df:Device ;
+    rdfs:range df:DataPoint .
+
+df:hasDataType a rdf:Property ;
+    rdfs:domain df:DataPoint ;
+    rdfs:range rdfs:Literal .
+
+df:hasDockerImage a rdf:Property ;
+    rdfs:label "has Docker Image" ;
+    rdfs:comment "Indicates that a Connector has a specific Docker Image." ;
+    rdfs:domain df:Connector ;
+    rdfs:range df:DockerImage .
+
+df:hasMetadata a rdf:Property ;
+    rdfs:domain df:DataPoint ;
+    rdfs:range rdfs:Literal .
+
+df:hasRole a rdf:Property ;
+    rdfs:label "has role" ;
+    rdfs:comment "Indicates that a service fulfills a specific role such as either data source or data sink." ;
+    rdfs:domain df:Service ;
+    rdfs:range df:ServiceRole .
+
+df:hasSubscriptionState a rdf:Property ;
+    rdfs:label "has Subscription State" ;
+    rdfs:domain df:Subscription ;
+    rdfs:range df:SubscriptionState .
+
+df:hasTopic a rdf:Property ;
+    rdfs:label "has topic" ;
+    rdfs:comment "Indicates that a message broker manages a specific topic" ;
+    rdfs:domain df:MessageBroker ;
+    rdfs:range df:Topic .
+
+df:hasTopicType a rdf:Property ;
+    rdfs:label "has Topic Type" ;
+    rdfs:comment "Indicates that a Topic is of a specific type. Types include telemetry_type, response_type and request_type" ;
+    rdfs:domain df:Topic ;
+    rdfs:range df:topicType .
+
+df:hasUnit a rdf:Property ;
+    rdfs:domain df:DataPoint ;
+    rdfs:range rdfs:Literal .
+
+df:moduleId a rdf:Property ;
+    rdfs:label "Module ID" ;
+    rdfs:domain df:Connector .
+
+df:moduleType a rdf:Property ;
+    rdfs:label "Module Type" ;
+    rdfs:domain df:Connector ;
+    rdfs:range xsd:string .
+
+df:providesDataPoint a rdf:Property ;
+    rdfs:label "provides Data Point" ;
+    rdfs:comment "Indicates that a service provides access to a specific data point." ;
+    rdfs:domain df:Service ;
+    rdfs:range df:DataPoint .
+
+df:providesService a rdf:Property ;
+    rdfs:label "provides service" ;
+    rdfs:comment "Indicates that a Devices offers some type of Service. Examples include e.g. a role as a data source such as an IIoT device." ;
+    rdfs:domain df:Device ;
+    rdfs:range df:Service .
+
+df:publishesTo a rdf:Property ;
+    rdfs:label "publishes to" ;
+    rdfs:comment "Indicates that a connector may publish data to a specific topic (e.g. writing messages into a topic)" ;
+    rdfs:domain df:Connector ;
+    rdfs:range df:Topic .
+
+df:requestType a df:topicType ;
+    rdfs:label "Request Type" ;
+    rdfs:comment "Represents a topic for request-related messages that are provided for and processed by services." .
+
+df:responseType a df:topicType ;
+    rdfs:label "Response Type" ;
+    rdfs:comment "Represents a topic for response-related messages that origin from a connector or processing module. Typically, responses are triggered by previously sent requests." .
+
+df:serialNumber a rdf:Property ;
+    rdfs:label "Serial Number" ;
+    rdfs:comment "Specifies a unique identifier assigned to each individual device distinguishing it from other devices, even of the same model." ;
+    rdfs:domain df:Device ;
+    rdfs:range xsd:string .
+
+df:subscribesTo a rdf:Property ;
+    rdfs:label "subscribes to" ;
+    rdfs:comment "Indicates that a connector may be subscribing data from a specific topic (e.g. reading messages from a topic)" ;
+    rdfs:domain df:Connector ;
+    rdfs:range df:Topic .
+
+df:subscribesToDataPoint a rdf:Property ;
+    rdfs:label "subscribes to Data Point" ;
+    rdfs:comment "Links a subscription to the data point it subscribes to." ;
+    rdfs:domain df:Subscription ;
+    rdfs:range df:DataPoint .
+
+df:subscriptionEnd a rdf:Property ;
+    rdfs:label "Subscription End" ;
+    rdfs:domain df:Subscription ;
+    rdfs:range xsd:dateTime .
+
+df:subscriptionStart a rdf:Property ;
+    rdfs:label "Subscription Start" ;
+    rdfs:domain df:Subscription ;
+    rdfs:range xsd:dateTime .
+
+df:supportsCapability a rdf:Property ;
+    rdfs:label "supports Capability" ;
+    rdfs:comment "Indicates that a service or connector supports a specific capability." ;
+    rdfs:domain df:Service ;
+    rdfs:range df:Capability .
+
+df:telemetryType a df:topicType ;
+    rdfs:label "Telemetry Type" ;
+    rdfs:comment "Represents a topic for telemetry-related messages emerging from a data source conveyed via a connector without requesting it." .
+
+df:topicName a rdf:Property ;
+    rdfs:label "Topic Name" ;
+    rdfs:comment "This property represents the name of a topic within our message broker." ;
+    rdfs:domain df:Topic ;
+    rdfs:range xsd:string .
+
+df:tracksSubscription a rdf:Property ;
+    rdfs:label "tracks Subscription" ;
+    rdfs:comment "Indicates that a connector is tracking a subscription." ;
+    rdfs:domain df:Connector ;
+    rdfs:range df:Subscription .
+

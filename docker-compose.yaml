@@ -1,0 +1,202 @@
+networks:
+  fabric-lab:
+    driver: bridge
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.4
+    container_name: fabric-lab_zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "22181:2181"
+    networks:
+      - fabric-lab
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.4
+    container_name: fabric-lab_kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://10.157.101.85:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - fabric-lab
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-consumer-groups --bootstrap-server kafka:9092 --describe --all-groups || exit 1"]
+      interval: 10s
+      timeout: 2s
+      retries: 4
+
+  graphdb:
+    image: ontotext/graphdb:10.5.1
+    container_name: fabric-lab_graphdb
+    ports:
+      - "7200:7200"
+    networks:
+      - fabric-lab
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-H", "Accept: text/html", "http://localhost:7200"]
+      interval: 5s
+      timeout: 1s
+      retries: 5
+
+  init_graphdb:
+    image: python:3.10-slim
+    container_name: fabric-lab_init_graphdb
+    depends_on:
+      - graphdb
+    volumes:
+      - ./GraphDB:/init
+    working_dir: /init
+    command: ["sh", "-c", "pip install requests && python init_repo.py"]
+    networks:
+      - fabric-lab
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: fabric-lab_kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
+    networks:
+      - fabric-lab
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: fabric-lab_portainer
+    restart: unless-stopped
+    ports:
+      - "9100:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - fabric-lab
+
+  opcua_sample_server_assembly_station:
+    image: stephantrattnig/opcua_sample_server:latest
+    container_name: fabric-lab_opcua-assembly-station
+    restart: unless-stopped
+    command: ["python", "-m", "main", "assembly_station"]
+    networks:
+      - fabric-lab
+    healthcheck:
+      test: ["CMD-SHELL", "python", "/app/test/healthcheck.py"]
+      interval: 5s
+      timeout: 2s
+      retries: 2
+
+  opcua_sample_server_cnc_milling:
+    image: stephantrattnig/opcua_sample_server:latest
+    container_name: fabric-lab_opcua-cnc-milling
+    restart: unless-stopped
+    command: ["python", "-m", "main", "cnc_milling"]
+    networks:
+      - fabric-lab
+    healthcheck:
+      test: ["CMD-SHELL", "python", "/app/test/healthcheck.py"]
+      interval: 5s
+      timeout: 2s
+      retries: 2
+
+  opcua_sample_server_injection_molding:
+    image: stephantrattnig/opcua_sample_server:latest
+    container_name: fabric-lab_opcua-injection_molding
+    restart: unless-stopped
+    command: ["python", "-m", "main", "injection_molding"]
+    networks:
+      - fabric-lab
+    healthcheck:
+      test: ["CMD-SHELL", "python", "/app/test/healthcheck.py"]
+      interval: 5s
+      timeout: 2s
+      retries: 2
+
+  connector_opcua_assembly_station:
+    image: stephantrattnig/connector-opcua:latest
+    container_name: fabric-lab_connector-opcua-assembly-station
+    restart: unless-stopped
+    env_file:
+      - ./ConnectorOPCUA/connector_assembly_station.env
+    command: ["python", "-m", "connector_opcua.connector_entrypoint"]
+    depends_on:
+      graphdb:
+        condition: service_healthy
+      opcua_sample_server_assembly_station:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - fabric-lab
+
+  connector_opcua_cnc_milling:
+    image: stephantrattnig/connector-opcua:latest
+    container_name: fabric-lab_connector-opcua-cnc-milling
+    restart: unless-stopped
+    env_file:
+      - ./ConnectorOPCUA/connector_cnc_milling.env
+    command: ["python", "-m", "connector_opcua.connector_entrypoint"]
+    depends_on:
+      graphdb:
+        condition: service_healthy
+      opcua_sample_server_cnc_milling:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - fabric-lab
+
+  connector_opcua_injection_molding:
+    image: stephantrattnig/connector-opcua:latest
+    container_name: fabric-lab_connector-opcua-injection-molding
+    restart: unless-stopped
+    env_file:
+      - ./ConnectorOPCUA/connector_injection_molding.env
+    command: ["python", "-m", "connector_opcua.connector_entrypoint"]
+    depends_on:
+      graphdb:
+        condition: service_healthy
+      opcua_sample_server_injection_molding:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - fabric-lab
+
+  jupyterlab:
+    image: quay.io/jupyter/datascience-notebook:notebook-7.4.4
+    container_name: fabric-lab_jupyterlab
+    ports:
+      - "8889:8888"
+    volumes:
+      - jupyterlab_data:/home/jovyan/work
+    env_file:
+      - ./Client/client_config.env
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    command: >
+      bash -c "
+        rm -rf /home/jovyan/work/client &&
+        git clone https://github.com/manufacturing-data-fabric/client.git /home/jovyan/work/client &&
+        cd /home/jovyan/work/client &&
+        pip install --no-cache-dir '.[deploy]' &&
+        start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''"
+    networks:
+      - fabric-lab
+
+volumes:
+  portainer_data:
+  jupyterlab_data:
