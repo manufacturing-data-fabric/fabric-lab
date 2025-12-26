@@ -116,5 +116,5 @@ For issues or contributions, feel free to open a ticket or fork the repo. Happy 
 
 ## deprecated
 
-portainer setting:
+portainer setting (local):
 local username: admin
